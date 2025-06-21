@@ -14,31 +14,60 @@ export async function loader() {
 // Send text to your backend API
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const text = formData.get("text");
+  const method = request.method;
 
-  if (!text || typeof text !== "string") {
-    return json({ error: "Invalid text input" }, { status: 400 });
+  if (method === "POST") {
+    const text = formData.get("text");
+
+    if (!text || typeof text !== "string") {
+      return json({ error: "Invalid text input" }, { status: 400 });
+    }
+
+    const res = await fetch("http://localhost:3000/snippets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      return json({ error: result.error || "Something went wrong" }, { status: res.status });
+    }
+
+    return null;
   }
 
-  const res = await fetch("http://localhost:3000/snippets", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
-  });
+  if (method === "DELETE") {
+    const id = formData.get("id");
 
-  const result = await res.json();
+    if (!id || typeof id !== "string") {
+      return json({ error: "Invalid ID" }, { status: 400 });
+    }
 
-  if (!res.ok) {
-    return json({ error: result.error || "Something went wrong" }, { status: res.status });
+    const res = await fetch(`http://localhost:3000/snippets/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      return json({ error: "Failed to delete snippet" }, { status: 500 });
+    }
+
+    return null;
   }
 
-  return null;
+  return json({ error: "Method not allowed" }, { status: 405 });
 }
+
 
 export default function Index() {
   const snippets = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  const sortedSnippets = [...snippets].sort(
+  (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+);
 
   return (
     <main className="p-6 max-w-2xl mx-auto font-sans">
@@ -66,7 +95,7 @@ export default function Index() {
       <section>
         <h2 className="text-xl font-semibold mb-2">Previous Snippets</h2>
         <ul className="space-y-4">
-          {snippets.map((snippet: Snippet) => (
+          {sortedSnippets.map((snippet: Snippet) => (
             <li key={snippet.id} className="border p-4 rounded bg-gray-50">
               <p className="text-gray-700 mb-2">
                 <strong>Original:</strong> {snippet.text}
@@ -77,6 +106,19 @@ export default function Index() {
               <p className="text-sm text-gray-400">
                 {new Date(snippet.createdAt).toLocaleString()}
               </p>
+              <Form method="delete"   onSubmit={(e) => {
+                if (!confirm("Are you sure you want to delete this snippet?")) {
+                  e.preventDefault();
+                }
+              }}>
+                <input type="hidden" name="id" value={snippet.id} />
+                <button
+                  type="submit"
+                  className="text-sm text-red-500 hover:underline"
+                >
+                  Delete
+                </button>
+              </Form>
             </li>
           ))}
         </ul>
