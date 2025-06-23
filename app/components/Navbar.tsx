@@ -1,8 +1,10 @@
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 import { useAuth } from "~/context/AuthContext";
 
 export function Navbar() {
   const { user, logout } = useAuth();
+    const navigate = useNavigate(); 
+
 
   return (
     <nav className="bg-emerald-700 text-white px-6 py-3 flex justify-between items-center">
@@ -12,7 +14,10 @@ export function Navbar() {
           <div className="flex items-center space-x-4">
             <span className="text-emerald-100">Hello, {user.email}</span>
             <button
-              onClick={logout}
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
               className="bg-emerald-800 hover:bg-emerald-900 px-3 py-1 rounded"
             >
               Logout

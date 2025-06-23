@@ -6,9 +6,11 @@ interface SnippetListProps {
 }
 
 export function SnippetList({ snippets }: SnippetListProps) {
+  const reversedSnippets = [...snippets].reverse();
+
   return (
     <ul className="space-y-6">
-      {snippets.map((snippet) => (
+      {reversedSnippets.map((snippet) => (
         <SnippetCard key={snippet.id} snippet={snippet} />
       ))}
     </ul>

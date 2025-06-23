@@ -1,5 +1,4 @@
-import { json, redirect } from "@remix-run/node";
-import { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs, ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { useLoaderData, useActionData, useNavigation } from "@remix-run/react";
 import { Snippet } from "~/types/snippet";
 import { SnippetForm } from "~/components/SnippetForm";
@@ -45,7 +44,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ error: result.error || "Error creating snippet" }, { status: res.status });
   }
 
-  return null;
+  return redirect("/");
 }
 
 export default function Index() {
@@ -61,10 +60,14 @@ export default function Index() {
         <h1 className="text-3xl font-bold mb-6 text-emerald-900 text-center">
           AI Snippet Summarizer
         </h1>
-          <SnippetForm isSubmitting={navigation.state === "submitting"} error={actionData?.error} />
+          <SnippetForm key={snippets.length} isSubmitting={navigation.state === "submitting"} error={actionData?.error} />
         <hr className="my-8 border-t border-slate-100" />
         <h2 className="text-2xl font-semibold mb-4 text-emerald-800">Previous Snippets</h2>
-        <SnippetList snippets={snippets} />
+        {snippets.length === 0 ? (
+          <p className="text-center text-slate-500 pt-8">You haven&apos;t created any snippets yet. Get started above!</p>
+        ) : (
+          <SnippetList snippets={snippets} />
+        )}
       </div>
     </main>
     </>

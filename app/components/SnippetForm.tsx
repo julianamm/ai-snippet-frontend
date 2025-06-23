@@ -7,10 +7,7 @@ interface SnippetFormProps {
 
 export function SnippetForm({ isSubmitting, error }: SnippetFormProps) {
   return (
-    <Form 
-      method="post" 
-      className="space-y-4"
-    >
+    <Form method="post" className="space-y-4">
       <label htmlFor="text" className="sr-only">
         Text to summarize
       </label>
