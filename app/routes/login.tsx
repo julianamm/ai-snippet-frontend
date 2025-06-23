@@ -1,4 +1,4 @@
-import { Form, useActionData, useNavigation, useNavigate, Link } from "@remix-run/react";
+import { Form, useActionData, useNavigation, useNavigate } from "@remix-run/react";
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { useAuth } from "~/context/AuthContext";
 import { User } from "~/types/user";
@@ -82,12 +82,6 @@ export default function LoginPage() {
           </button>
         </Form>
       </div>
-      <Link
-        to="/"
-        className="inline-block text-emerald-700 hover:underline text-sm mt-6"
-      >
-        ← Back to Home
-      </Link>
     </main>
 
   );
