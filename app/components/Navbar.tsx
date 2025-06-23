@@ -10,7 +10,7 @@ export function Navbar() {
       <div>
         {user ? (
           <div className="flex items-center space-x-4">
-            <span className="text-emerald-100">Hello, {user.username}</span>
+            <span className="text-emerald-100">Hello, {user.email}</span>
             <button
               onClick={logout}
               className="bg-emerald-800 hover:bg-emerald-900 px-3 py-1 rounded"

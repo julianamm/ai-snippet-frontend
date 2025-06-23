@@ -1,11 +1,16 @@
-import { Form, useNavigation } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 
-export function SnippetForm() {
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+interface SnippetFormProps {
+  isSubmitting: boolean;
+  error?: string;
+}
 
+export function SnippetForm({ isSubmitting, error }: SnippetFormProps) {
   return (
-    <Form method="post" className="space-y-4">
+    <Form 
+      method="post" 
+      className="space-y-4"
+    >
       <label htmlFor="text" className="sr-only">
         Text to summarize
       </label>
@@ -17,6 +22,7 @@ export function SnippetForm() {
         placeholder="Paste your text here..."
         required
       />
+      {error && <p className="text-red-500 text-center">{error}</p>}
       <button
         type="submit"
         className="w-full bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-800 transition disabled:opacity-50"

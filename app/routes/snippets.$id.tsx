@@ -1,4 +1,3 @@
-// app/routes/snippets.$id.tsx
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -37,13 +36,6 @@ export default function SnippetDetail() {
         <p className="mb-4">{snippet.summary}</p>
         <h2 className="text-xl font-semibold mb-2 text-slate-800">Original Text</h2>
         <p className="mb-4">{snippet.text}</p>
-        <p className="text-sm text-slate-500">
-          {new Date(snippet.createdAt).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-        </p>
       </div>
     </main>
   );

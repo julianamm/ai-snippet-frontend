@@ -1,5 +1,4 @@
 import { Snippet } from "~/types/snippet";
-import { formatDistanceToNow } from "date-fns";
 import { Link } from "@remix-run/react";
 
 interface SnippetCardProps {
@@ -7,9 +6,6 @@ interface SnippetCardProps {
 }
 
 export function SnippetCard({ snippet }: SnippetCardProps) {
-  const createdDate = new Date(snippet.createdAt);
-  const relativeTime = formatDistanceToNow(createdDate, { addSuffix: true });
-
   return (
     <Link to={`/snippets/${snippet.id}`} className="block">
       <li className="bg-white hover:bg-slate-50 border border-slate-100 rounded-xl shadow-sm p-6 hover:shadow-md transition">
@@ -18,10 +14,6 @@ export function SnippetCard({ snippet }: SnippetCardProps) {
 
         <h4 className="text-slate-800 font-medium">Original Text</h4>
         <p className="text-slate-700 mb-4 text-sm whitespace-pre-wrap">{snippet.text}</p>
-
-        <p className="text-xs text-slate-500">
-          {relativeTime}
-        </p>
       </li>
     </Link>
   );

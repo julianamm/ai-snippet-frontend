@@ -2,8 +2,9 @@ import { Form, useActionData, useNavigation, useNavigate, Link } from "@remix-ru
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { useAuth } from "~/context/AuthContext";
 import { User } from "~/types/user";
+import { useEffect } from "react";
 
-type ActionData = { error: string } | { user: User };
+type ActionData = { error: string } | { user: User; token: string };
 
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -12,22 +13,30 @@ export async function action({ request }: ActionFunctionArgs) {
   const password = formData.get("password");
 
   if (typeof email !== "string" || typeof password !== "string") {
-    return json<ActionData>({ error: "Email and password are required" }, { status: 400 });
+    return json({ error: "Email and password are required" }, { status: 400 });
   }
 
-  const res = await fetch("http://localhost:3000/auth/login", {
+  const res = await fetch(`${process.env.API_URL || "http://localhost:3000"}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, code: password }),
   });
 
   if (!res.ok) {
-    return json<ActionData>({ error: "Invalid credentials" }, { status: 401 });
+    return json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  const user = await res.json();
-  return json<ActionData>({ user });
+  const { token } = await res.json();
+  return json(
+    { user: { email }, token },
+    {
+      headers: {
+        "Set-Cookie": `token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600`,
+      },
+    }
+  );
 }
+
 
 export default function LoginPage() {
   const actionData = useActionData<ActionData>();
@@ -35,10 +44,12 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  if (actionData && "user" in actionData) {
-    login(actionData.user); 
-    navigate("/"); 
-  }
+  useEffect(() => {
+    if (actionData && "user" in actionData) {
+      login(actionData.user, actionData.token);
+      navigate("/");
+    }
+  }, [actionData, login, navigate]);
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-emerald-50 p-8">
