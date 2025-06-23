@@ -4,6 +4,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { Snippet } from "~/types/snippet";
 import { SnippetForm } from "~/components/SnippetForm";
 import { SnippetList } from "~/components/SnippetList";
+import { Navbar } from "~/components/Navbar";
 
 export async function loader() {
   const res = await fetch("http://localhost:3000/snippets");
@@ -43,6 +44,8 @@ export default function Index() {
   const snippets = useLoaderData<Snippet[]>();
 
   return (
+    <>
+    <Navbar />
     <main className="bg-emerald-50 min-h-screen p-8 font-sans">
       <div className="max-w-3xl mx-auto bg-white border border-slate-100 p-8 rounded-xl shadow">
         <h1 className="text-3xl font-bold mb-6 text-emerald-900 text-center">
@@ -54,5 +57,6 @@ export default function Index() {
         <SnippetList snippets={snippets} />
       </div>
     </main>
+    </>
   );
 }

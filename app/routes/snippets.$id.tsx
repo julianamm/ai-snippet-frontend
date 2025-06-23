@@ -31,7 +31,7 @@ export default function SnippetDetail() {
         ← Back to Home
       </Link>
 
-      <div className="max-w-2xl mx-auto bg-white p-8 border border-slate-100 rounded-xl shadow">
+      <div className="max-w-2xl mx-auto bg-white p-8 mt-2 border border-slate-100 rounded-xl shadow">
         <h1 className="text-2xl font-bold mb-4 text-emerald-800">Snippet Detail</h1>
         <h2 className="text-xl font-semibold mb-2 text-slate-800">Summary</h2>
         <p className="mb-4">{snippet.summary}</p>
