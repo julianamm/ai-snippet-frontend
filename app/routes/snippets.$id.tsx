@@ -24,6 +24,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       Authorization: `Bearer ${token}`,
     },
   })
+  if (res.status === 403) {
+    throw new Response('Access denied', { status: 403 });
+  }
   if (!res.ok) {
     throw new Response('Snippet not found', { status: 404 })
   }
