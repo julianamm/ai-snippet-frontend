@@ -1,22 +1,37 @@
 import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, redirect, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Snippet } from "~/types/snippet";
 
-export async function loader({ params }: LoaderFunctionArgs) {
-  const { id } = params;
-  if (!id) {
-    throw new Response("Not Found", { status: 404 });
-  }
-
-  const res = await fetch(`http://localhost:3000/snippets/${id}`);
-  if (!res.ok) {
-    throw new Response("Snippet not found", { status: 404 });
-  }
-
-  const data = await res.json();
-  return json(data as Snippet);
+function getTokenFromCookies(request: Request): string | null {
+  const cookieHeader = request.headers.get('Cookie')
+  return cookieHeader?.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || null
 }
+
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { id } = params
+  if (!id) {
+    throw new Response('Not Found', { status: 404 })
+  }
+
+  const token = getTokenFromCookies(request)
+  if (!token) {
+    return redirect('/login')
+  }
+
+  const res = await fetch(`http://localhost:3000/snippets/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  if (!res.ok) {
+    throw new Response('Snippet not found', { status: 404 })
+  }
+
+  const data = await res.json()
+  return json(data as Snippet)
+}
+
 
 export default function SnippetDetail() {
   const snippet = useLoaderData<Snippet>();
