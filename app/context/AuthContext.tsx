@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useCallback,
+} from "react";
 import { User } from "~/types/user";
 
 interface AuthContextValue {
@@ -10,32 +17,42 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+const USER_KEY = "user";
+const TOKEN_KEY = "token";
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    const savedToken = localStorage.getItem("token");
-    if (savedUser && savedToken) {
-      setUser(JSON.parse(savedUser));
-      setToken(savedToken);
+    try {
+      const storedUser = localStorage.getItem(USER_KEY);
+      const storedToken = localStorage.getItem(TOKEN_KEY);
+
+      if (storedUser && storedToken) {
+        setUser(JSON.parse(storedUser));
+        setToken(storedToken);
+      }
+    } catch (err) {
+      console.warn("Failed to parse auth from localStorage", err);
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(TOKEN_KEY);
     }
   }, []);
 
-  const login = (u: User, t: string) => {
+  const login = useCallback((u: User, t: string) => {
     setUser(u);
     setToken(t);
-    localStorage.setItem("user", JSON.stringify(u));
-    localStorage.setItem("token", t);
-  };
-  
-  const logout = () => {
+    localStorage.setItem(USER_KEY, JSON.stringify(u));
+    localStorage.setItem(TOKEN_KEY, t);
+  }, []);
+
+  const logout = useCallback(() => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-  };
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
@@ -44,8 +61,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
+export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  if (!ctx) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return ctx;
 }
