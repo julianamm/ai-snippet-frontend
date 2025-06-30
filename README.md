@@ -157,6 +157,4 @@ API_URL=http://localhost:3000
 
 ## Author
 
-Raphael Andrade 
-Full Stack Developer
-LinkedIn: https://www.linkedin.com/in/raphaelandrade1/
+Raphael Andrade - Full Stack Developer - LinkedIn: https://www.linkedin.com/in/raphaelandrade1/
